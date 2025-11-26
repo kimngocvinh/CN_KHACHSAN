@@ -5,29 +5,27 @@
 
 const BASE_URL = 'http://localhost:8080/api/v1';
 
-const timestamp = Date.now();
-
 const users = [
   {
-    fullName: 'Test Customer',
-    email: `customer${timestamp}@test.com`,
-    password: 'password123',
+    fullName: 'Khách Hàng',
+    email: 'customer@hotel.com',
+    password: '123456',
     phoneNumber: '0912345678',
     role: 'Khách hàng',
     roleId: 1
   },
   {
-    fullName: 'Test Receptionist',
-    email: `receptionist${timestamp}@test.com`,
-    password: 'password123',
+    fullName: 'Lễ Tân',
+    email: 'letan@hotel.com',
+    password: '123456',
     phoneNumber: '0333444555',
     role: 'Nhân viên lễ tân',
     roleId: 2
   },
   {
-    fullName: 'Test Admin',
-    email: `admin${timestamp}@test.com`,
-    password: 'password123',
+    fullName: 'Quản Trị Viên',
+    email: 'admin@hotel.com',
+    password: '123456',
     phoneNumber: '0555666777',
     role: 'Quản trị viên',
     roleId: 3
@@ -69,7 +67,7 @@ async function updateUserRole(userId, roleId) {
     const connection = await mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: '',
+      password: 'Vinh@17112004',
       database: 'hotel_booking_db'
     });
 

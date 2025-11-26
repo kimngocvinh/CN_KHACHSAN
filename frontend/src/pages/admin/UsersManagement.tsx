@@ -21,7 +21,7 @@ interface User {
 const UsersManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [roleFilter, setRoleFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -35,7 +35,7 @@ const UsersManagement = () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', '10');
-      if (roleFilter) params.append('role', roleFilter);
+      if (roleFilter && roleFilter !== 'all') params.append('role', roleFilter);
 
       const response = await api.get(`/users?${params.toString()}`);
       if (response.data.success) {
@@ -87,7 +87,7 @@ const UsersManagement = () => {
               <SelectValue placeholder="Tất cả vai trò" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tất cả</SelectItem>
+              <SelectItem value="all">Tất cả</SelectItem>
               <SelectItem value="1">Khách hàng</SelectItem>
               <SelectItem value="2">Lễ tân</SelectItem>
               <SelectItem value="3">Admin</SelectItem>
@@ -96,7 +96,7 @@ const UsersManagement = () => {
 
           <Button
             variant="outline"
-            onClick={() => setRoleFilter('')}
+            onClick={() => setRoleFilter('all')}
           >
             Xóa bộ lọc
           </Button>

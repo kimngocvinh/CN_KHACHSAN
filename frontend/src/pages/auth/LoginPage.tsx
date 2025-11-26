@@ -26,13 +26,19 @@ const LoginPage = () => {
       setLoading(true);
       setError('');
       
+      console.log('Sending login request:', data);
       const response = await api.post('/auth/login', data);
+      console.log('Login response:', response.data);
       
       if (response.data.success) {
         setAuth(response.data.data.user, response.data.data.accessToken);
         navigate('/');
+      } else {
+        setError(response.data.message || 'Đăng nhập thất bại');
       }
     } catch (err: any) {
+      console.error('Login error:', err);
+      console.error('Error response:', err.response);
       setError(err.response?.data?.message || 'Đăng nhập thất bại');
     } finally {
       setLoading(false);

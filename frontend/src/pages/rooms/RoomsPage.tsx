@@ -18,7 +18,7 @@ const RoomsPage = () => {
     checkIn: '',
     checkOut: '',
     capacity: '',
-    roomType: ''
+    roomType: 'all'
   });
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const RoomsPage = () => {
       if (filters.checkIn) params.append('checkIn', filters.checkIn);
       if (filters.checkOut) params.append('checkOut', filters.checkOut);
       if (filters.capacity) params.append('capacity', filters.capacity);
-      if (filters.roomType) params.append('roomType', filters.roomType);
+      if (filters.roomType && filters.roomType !== 'all') params.append('roomType', filters.roomType);
 
       const response = await api.get(`/rooms?${params.toString()}`);
       if (response.data.success) {
@@ -111,7 +111,7 @@ const RoomsPage = () => {
                   <SelectValue placeholder="Tất cả" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tất cả</SelectItem>
+                  <SelectItem value="all">Tất cả</SelectItem>
                   <SelectItem value="1">Standard</SelectItem>
                   <SelectItem value="2">Deluxe</SelectItem>
                   <SelectItem value="3">Suite</SelectItem>

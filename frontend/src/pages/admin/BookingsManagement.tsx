@@ -12,7 +12,7 @@ import { Loader2, Filter } from 'lucide-react';
 const BookingsManagement = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const BookingsManagement = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (statusFilter) params.append('status', statusFilter);
+      if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
       if (dateFilter) params.append('date', dateFilter);
 
       const response = await api.get(`/bookings?${params.toString()}`);
@@ -96,7 +96,7 @@ const BookingsManagement = () => {
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tất cả</SelectItem>
+                <SelectItem value="all">Tất cả</SelectItem>
                 <SelectItem value="pending">Chờ xác nhận</SelectItem>
                 <SelectItem value="confirmed">Đã xác nhận</SelectItem>
                 <SelectItem value="checked_in">Đã nhận phòng</SelectItem>
@@ -119,7 +119,7 @@ const BookingsManagement = () => {
             <Button
               variant="outline"
               onClick={() => {
-                setStatusFilter('');
+                setStatusFilter('all');
                 setDateFilter('');
               }}
             >

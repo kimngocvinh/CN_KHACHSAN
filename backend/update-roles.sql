@@ -1,19 +1,17 @@
--- Update roles cho các user test
--- Chạy script này sau khi chạy seed-users.js
+-- Update roles cho các user
+-- Chạy script này để cập nhật role cho lễ tân và admin
 
 USE hotel_booking_db;
 
 -- Update receptionist role
 UPDATE users 
 SET role_id = 2 
-WHERE email LIKE 'receptionist%@test.com' 
-AND role_id = 1;
+WHERE email = 'letan@hotel.com';
 
 -- Update admin role
 UPDATE users 
 SET role_id = 3 
-WHERE email LIKE 'admin%@test.com' 
-AND role_id = 1;
+WHERE email = 'admin@hotel.com';
 
 -- Verify
 SELECT user_id, full_name, email, role_id, 
@@ -23,5 +21,5 @@ SELECT user_id, full_name, email, role_id,
            WHEN 3 THEN 'Quản trị viên'
        END as role_name
 FROM users
-WHERE email LIKE '%@test.com'
-ORDER BY role_id, created_at DESC;
+WHERE email IN ('customer@hotel.com', 'letan@hotel.com', 'admin@hotel.com')
+ORDER BY role_id;

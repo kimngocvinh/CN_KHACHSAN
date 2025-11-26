@@ -14,7 +14,7 @@ const AdminLayout = () => {
   };
 
   const menuItems = [
-    { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/admin', icon: LayoutDashboard, label: 'Trang tổng quan' },
     { path: '/admin/rooms', icon: Bed, label: 'Quản lý phòng' },
     { path: '/admin/bookings', icon: Calendar, label: 'Quản lý đặt phòng' },
     { path: '/admin/users', icon: Users, label: 'Quản lý người dùng' },
