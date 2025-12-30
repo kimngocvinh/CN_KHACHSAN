@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Image, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 interface RoomForm {
@@ -20,10 +20,21 @@ interface RoomForm {
   description: string;
 }
 
+interface RoomImageType {
+  image_id: number;
+  room_id: number;
+  image_url: string;
+  is_primary: boolean;
+}
+
 const RoomsManagement = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [roomImages, setRoomImages] = useState<RoomImageType[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<RoomForm>();
 
@@ -97,6 +108,55 @@ const RoomsManagement = () => {
     }
   };
 
+  const handleOpenImageDialog = async (room: Room) => {
+    setSelectedRoom(room);
+    setImageDialogOpen(true);
+    try {
+      const response = await api.get(`/rooms/${room.room_id}/images`);
+      if (response.data.success) {
+        setRoomImages(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    }
+  };
+
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedRoom) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    setUploading(true);
+    try {
+      const response = await api.post(`/rooms/${selectedRoom.room_id}/images`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (response.data.success) {
+        setRoomImages([...roomImages, response.data.data]);
+        fetchRooms();
+      }
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Upload thất bại');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleDeleteImage = async (imageId: number) => {
+    if (!selectedRoom || !confirm('Bạn có chắc muốn xóa ảnh này?')) return;
+
+    try {
+      await api.delete(`/rooms/${selectedRoom.room_id}/images/${imageId}`);
+      setRoomImages(roomImages.filter(img => img.image_id !== imageId));
+      fetchRooms();
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Xóa ảnh thất bại');
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -153,10 +213,10 @@ const RoomsManagement = () => {
                       <SelectValue placeholder="Chọn loại phòng" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">Standard</SelectItem>
-                      <SelectItem value="2">Deluxe</SelectItem>
-                      <SelectItem value="3">Suite</SelectItem>
-                      <SelectItem value="4">Family</SelectItem>
+                      <SelectItem value="1">Phòng Tiêu chuẩn</SelectItem>
+                      <SelectItem value="2">Phòng Cao cấp</SelectItem>
+                      <SelectItem value="3">Phòng Hạng sang</SelectItem>
+                      <SelectItem value="4">Phòng Gia đình</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -247,6 +307,14 @@ const RoomsManagement = () => {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => handleOpenImageDialog(room)}
+                      title="Quản lý ảnh"
+                    >
+                      <Image className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleOpenDialog(room)}
                     >
                       <Edit className="h-4 w-4" />
@@ -265,6 +333,60 @@ const RoomsManagement = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Image Management Dialog */}
+      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Quản lý ảnh phòng {selectedRoom?.room_number}</DialogTitle>
+            <DialogDescription>
+              Thêm hoặc xóa ảnh cho phòng
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Upload button */}
+            <div className="flex items-center gap-4">
+              <Input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleUploadImage}
+                disabled={uploading}
+                className="max-w-xs"
+              />
+              {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
+            </div>
+
+            {/* Images grid */}
+            <div className="grid grid-cols-3 gap-4">
+              {roomImages.map((image) => (
+                <div key={image.image_id} className="relative group">
+                  <img
+                    src={`http://localhost:8080${image.image_url}`}
+                    alt="Room"
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                  <button
+                    onClick={() => handleDeleteImage(image.image_id)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {image.is_primary && (
+                    <Badge className="absolute bottom-2 left-2">Ảnh chính</Badge>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {roomImages.length === 0 && (
+              <p className="text-center text-muted-foreground py-8">
+                Chưa có ảnh nào. Hãy upload ảnh cho phòng này.
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -6,6 +6,6 @@ const router = Router();
 
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, updateProfile);
-router.get('/', authenticate, authorize(3), getAllUsers);
+router.get('/', authenticate, authorize(2, 3), getAllUsers);
 
 export default router;

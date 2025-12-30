@@ -112,10 +112,10 @@ const RoomsPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value="1">Standard</SelectItem>
-                  <SelectItem value="2">Deluxe</SelectItem>
-                  <SelectItem value="3">Suite</SelectItem>
-                  <SelectItem value="4">Family</SelectItem>
+                  <SelectItem value="1">Phòng Tiêu chuẩn</SelectItem>
+                  <SelectItem value="2">Phòng Cao cấp</SelectItem>
+                  <SelectItem value="3">Phòng Hạng sang</SelectItem>
+                  <SelectItem value="4">Phòng Gia đình</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -143,13 +143,19 @@ const RoomsPage = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room) => (
-              <Card key={room.room_id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card key={room.room_id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                 <div className="aspect-video bg-gray-200 relative">
                   {room.images && room.images.length > 0 ? (
                     <img
-                      src={room.images[0].image_url}
+                      src={room.images[0].image_url.startsWith('/uploads') 
+                        ? `http://localhost:8080${room.images[0].image_url}` 
+                        : room.images[0].image_url}
                       alt={`Phòng ${room.room_number}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground">Không có ảnh</div>';
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-muted-foreground">
@@ -161,7 +167,7 @@ const RoomsPage = () => {
                   </Badge>
                 </div>
 
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <CardTitle className="flex items-center justify-between">
                     <span>Phòng {room.room_number}</span>
                     <Badge variant={room.status === 'available' ? 'default' : 'secondary'}>
@@ -170,23 +176,21 @@ const RoomsPage = () => {
                   </CardTitle>
                 </CardHeader>
 
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      <span>{room.capacity} người</span>
-                    </div>
-                    <p className="text-sm line-clamp-2">{room.description}</p>
-                    <div className="pt-2">
-                      <p className="text-2xl font-bold text-primary">
-                        {formatPrice(room.price_per_night)}
-                        <span className="text-sm font-normal text-muted-foreground">/đêm</span>
-                      </p>
-                    </div>
+                <CardContent className="flex-1 flex flex-col pb-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <Users className="h-4 w-4" />
+                    <span>{room.capacity} người</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3 flex-1">{room.description}</p>
+                  <div>
+                    <p className="text-2xl font-bold text-primary">
+                      {formatPrice(room.price_per_night)}
+                      <span className="text-sm font-normal text-muted-foreground">/đêm</span>
+                    </p>
                   </div>
                 </CardContent>
 
-                <CardFooter>
+                <CardFooter className="pt-0">
                   <Button
                     className="w-full"
                     onClick={() => navigate(`/rooms/${room.room_id}`)}

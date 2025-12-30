@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Hotel, User, LogOut, Calendar, LayoutDashboard } from 'lucide-react';
+import { Hotel, User, LogOut, Calendar, LayoutDashboard, Mail, Phone, MapPin, Facebook, Clock } from 'lucide-react';
 
 const MainLayout = () => {
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -113,9 +113,78 @@ const MainLayout = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50 py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Hotel Booking. All rights reserved.</p>
+      <footer className="bg-gray-900 text-white">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            {/* Logo & Giới thiệu */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 font-bold text-xl">
+                <Hotel className="h-6 w-6 text-blue-400" />
+                <span>Hotel Booking</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Hệ thống đặt phòng khách sạn trực tuyến hàng đầu. Cam kết mang đến trải nghiệm tốt nhất cho khách hàng.
+              </p>
+            </div>
+
+            {/* Liên hệ */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Liên hệ</h3>
+              <div className="space-y-3 text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-blue-400" />
+                  <span>0392 762 050</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-blue-400" />
+                  <span>contact@hotelbooking.vn</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 text-blue-400 mt-0.5" />
+                  <span>123 Đường ABC, Quận 1, TP. Hồ Chí Minh</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Giờ làm việc */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Giờ làm việc</h3>
+              <div className="space-y-3 text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-blue-400" />
+                  <span>Hỗ trợ 24/7</span>
+                </div>
+                <p>Thứ 2 - Chủ nhật</p>
+                <p>Check-in: 14:00</p>
+                <p>Check-out: 12:00</p>
+              </div>
+            </div>
+
+            {/* Liên kết */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Liên kết</h3>
+              <div className="space-y-3 text-sm text-gray-400">
+                <Link to="/rooms" className="block hover:text-white transition-colors">
+                  Danh sách phòng
+                </Link>
+                <Link to="/reviews" className="block hover:text-white transition-colors">
+                  Đánh giá
+                </Link>
+                <Link to="/support" className="block hover:text-white transition-colors">
+                  Hỗ trợ
+                </Link>
+                <div className="flex items-center gap-3 pt-2">
+                  <a href="#" className="hover:text-blue-400 transition-colors">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+            <p>© 2024 Hotel Booking. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

@@ -9,6 +9,7 @@ import RoomImage from './roomImage.model';
 import Amenity from './amenity.model';
 import Payment from './payment.model';
 import Promotion from './promotion.model';
+import SupportRequest from './supportRequest.model';
 
 // Define associations
 User.belongsTo(Role, { foreignKey: 'role_id', as: 'role' });
@@ -47,5 +48,6 @@ export {
   RoomImage,
   Amenity,
   Payment,
-  Promotion
+  Promotion,
+  SupportRequest
 };

@@ -7,13 +7,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Filter } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Loader2, Filter, Banknote, Eye } from 'lucide-react';
 
 const BookingsManagement = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('');
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     fetchBookings();
@@ -41,6 +43,16 @@ const BookingsManagement = () => {
     try {
       await api.put(`/bookings/${bookingId}/status`, { status });
       alert('Cập nhật trạng thái thành công!');
+      fetchBookings();
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Cập nhật thất bại');
+    }
+  };
+
+  const handleUpdatePaymentStatus = async (bookingId: number, paymentStatus: string) => {
+    try {
+      await api.put(`/bookings/${bookingId}/payment-status`, { paymentStatus });
+      alert('Cập nhật trạng thái thanh toán thành công!');
       fetchBookings();
     } catch (error: any) {
       alert(error.response?.data?.message || 'Cập nhật thất bại');
@@ -139,8 +151,8 @@ const BookingsManagement = () => {
               <TableHead>Phòng</TableHead>
               <TableHead>Nhận phòng</TableHead>
               <TableHead>Trả phòng</TableHead>
-              <TableHead>Số người</TableHead>
               <TableHead>Tổng tiền</TableHead>
+              <TableHead>Thanh toán</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead>Thao tác</TableHead>
             </TableRow>
@@ -150,16 +162,46 @@ const BookingsManagement = () => {
               <TableRow key={booking.booking_id}>
                 <TableCell className="font-medium">#{booking.booking_id}</TableCell>
                 <TableCell>
-                  <div>
-                    <p className="font-medium">{booking.user?.full_name}</p>
-                    <p className="text-xs text-muted-foreground">{booking.user?.email}</p>
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <p className="font-medium">{booking.user?.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{booking.user?.email}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedBooking(booking)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </div>
                 </TableCell>
                 <TableCell>{booking.room?.room_number}</TableCell>
                 <TableCell>{formatDate(booking.check_in_date)}</TableCell>
                 <TableCell>{formatDate(booking.check_out_date)}</TableCell>
-                <TableCell>{booking.number_of_guests}</TableCell>
                 <TableCell className="font-semibold">{formatPrice(booking.total_price)}</TableCell>
+                <TableCell>
+                  {(booking as any).payment_method === 'payos' || (booking as any).payment_method === 'bank_transfer' ? (
+                    <Select
+                      value={(booking as any).payment_status || 'unpaid'}
+                      onValueChange={(value) => handleUpdatePaymentStatus(booking.booking_id, value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unpaid">Chưa TT</SelectItem>
+                        <SelectItem value="pending">Chờ TT</SelectItem>
+                        <SelectItem value="paid">Đã TT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <Banknote className="h-4 w-4 text-green-600" />
+                      <span className="text-sm">Tiền mặt</span>
+                    </div>
+                  )}
+                </TableCell>
                 <TableCell>{getStatusBadge(booking.status)}</TableCell>
                 <TableCell>
                   <Select
@@ -189,6 +231,50 @@ const BookingsManagement = () => {
           </div>
         )}
       </div>
+
+      {/* Customer Detail Dialog */}
+      <Dialog open={!!selectedBooking} onOpenChange={() => setSelectedBooking(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Thông tin khách hàng</DialogTitle>
+          </DialogHeader>
+          {selectedBooking && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Họ tên</Label>
+                  <p className="font-medium">{selectedBooking.user?.full_name}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Email</Label>
+                  <p className="font-medium">{selectedBooking.user?.email}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Số điện thoại</Label>
+                  <p className="font-medium">{(selectedBooking.user as any)?.phone_number || 'Chưa cập nhật'}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Số CCCD/CMND</Label>
+                  <p className="font-medium">{(selectedBooking.user as any)?.id_card || 'Chưa cập nhật'}</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-muted-foreground">Địa chỉ</Label>
+                <p className="font-medium">{(selectedBooking.user as any)?.address || 'Chưa cập nhật'}</p>
+              </div>
+              <div className="border-t pt-4">
+                <Label className="text-muted-foreground">Thông tin đặt phòng</Label>
+                <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+                  <p>Phòng: <span className="font-medium">{selectedBooking.room?.room_number}</span></p>
+                  <p>Số người: <span className="font-medium">{selectedBooking.number_of_guests}</span></p>
+                  <p>Nhận phòng: <span className="font-medium">{formatDate(selectedBooking.check_in_date)}</span></p>
+                  <p>Trả phòng: <span className="font-medium">{formatDate(selectedBooking.check_out_date)}</span></p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

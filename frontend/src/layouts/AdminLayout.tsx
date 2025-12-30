@@ -1,7 +1,7 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
-import { Hotel, LayoutDashboard, Bed, Calendar, Users, LogOut, Home } from 'lucide-react';
+import { Hotel, LayoutDashboard, Bed, Calendar, Users, LogOut, Headphones, Percent } from 'lucide-react';
 
 const AdminLayout = () => {
   const { user, logout } = useAuthStore();
@@ -18,6 +18,8 @@ const AdminLayout = () => {
     { path: '/admin/rooms', icon: Bed, label: 'Quản lý phòng' },
     { path: '/admin/bookings', icon: Calendar, label: 'Quản lý đặt phòng' },
     { path: '/admin/users', icon: Users, label: 'Quản lý người dùng' },
+    { path: '/admin/support', icon: Headphones, label: 'Yêu cầu hỗ trợ' },
+    { path: '/admin/promotions', icon: Percent, label: 'Khuyến mãi' },
   ];
 
   return (
@@ -25,10 +27,10 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-gray-900 text-white flex flex-col">
         <div className="p-4 border-b border-gray-800">
-          <Link to="/" className="flex items-center gap-2 font-bold text-xl">
+          <div className="flex items-center gap-2 font-bold text-xl">
             <Hotel className="h-6 w-6" />
             <span>Admin Panel</span>
-          </Link>
+          </div>
         </div>
 
         <nav className="flex-1 p-4">
@@ -59,14 +61,6 @@ const AdminLayout = () => {
             <p className="text-sm font-medium">{user?.fullName}</p>
             <p className="text-xs text-gray-400">{user?.role}</p>
           </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-white hover:bg-gray-800"
-            onClick={() => navigate('/')}
-          >
-            <Home className="mr-2 h-4 w-4" />
-            Về trang chủ
-          </Button>
           <Button
             variant="ghost"
             className="w-full justify-start text-white hover:bg-gray-800"

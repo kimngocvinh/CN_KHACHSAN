@@ -10,7 +10,7 @@ interface Config {
     expiresIn: string;
   };
   cors: {
-    origin: string;
+    origin: string | string[];
   };
 }
 
@@ -22,6 +22,8 @@ export const config: Config = {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
+    origin: process.env.CORS_ORIGIN 
+      ? process.env.CORS_ORIGIN.split(',') 
+      : ['http://localhost:5173', 'http://localhost:5174']
   }
 };

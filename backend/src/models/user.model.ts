@@ -7,12 +7,14 @@ interface UserAttributes {
   email: string;
   password_hash: string;
   phone_number?: string;
+  address?: string;
+  id_card?: string;
   role_id: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'user_id' | 'created_at' | 'updated_at'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'user_id' | 'created_at' | 'updated_at' | 'address' | 'id_card'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public user_id!: number;
@@ -20,6 +22,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public email!: string;
   public password_hash!: string;
   public phone_number?: string;
+  public address?: string;
+  public id_card?: string;
   public role_id!: number;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
@@ -46,6 +50,14 @@ User.init(
       allowNull: false
     },
     phone_number: {
+      type: DataTypes.STRING(20),
+      allowNull: true
+    },
+    address: {
+      type: DataTypes.STRING(500),
+      allowNull: true
+    },
+    id_card: {
       type: DataTypes.STRING(20),
       allowNull: true
     },

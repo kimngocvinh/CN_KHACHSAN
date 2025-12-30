@@ -165,3 +165,100 @@ export const updateRoomStatus = async (req: Request, res: Response) => {
     return errorResponse(res, 'Đã xảy ra lỗi', 'SERVER_ERROR', 500);
   }
 };
+
+
+export const addRoomImage = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      return errorResponse(res, 'Vui lòng chọn file ảnh', 'NO_FILE', 400);
+    }
+
+    const room = await Room.findByPk(id);
+    if (!room) {
+      return errorResponse(res, 'Không tìm thấy phòng', 'ROOM_NOT_FOUND', 404);
+    }
+
+    // Kiểm tra số lượng ảnh hiện tại
+    const imageCount = await RoomImage.count({ where: { room_id: id } });
+    const isPrimary = imageCount === 0;
+
+    const image = await RoomImage.create({
+      room_id: parseInt(id),
+      image_url: `/uploads/rooms/${file.filename}`,
+      is_primary: isPrimary
+    });
+
+    return successResponse(res, 'Thêm ảnh thành công.', image, 201);
+  } catch (error) {
+    console.error('Add room image error:', error);
+    return errorResponse(res, 'Đã xảy ra lỗi', 'SERVER_ERROR', 500);
+  }
+};
+
+export const deleteRoomImage = async (req: Request, res: Response) => {
+  try {
+    const { id, imageId } = req.params;
+    const fs = require('fs');
+    const path = require('path');
+
+    const image = await RoomImage.findOne({
+      where: { image_id: imageId, room_id: id }
+    });
+
+    if (!image) {
+      return errorResponse(res, 'Không tìm thấy ảnh', 'IMAGE_NOT_FOUND', 404);
+    }
+
+    // Xóa file vật lý
+    const filePath = path.join(__dirname, '../../../', image.image_url);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    await image.destroy();
+
+    return successResponse(res, 'Xóa ảnh thành công.', null);
+  } catch (error) {
+    console.error('Delete room image error:', error);
+    return errorResponse(res, 'Đã xảy ra lỗi', 'SERVER_ERROR', 500);
+  }
+};
+
+export const getRoomImages = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const images = await RoomImage.findAll({
+      where: { room_id: id },
+      order: [['is_primary', 'DESC']]
+    });
+
+    return successResponse(res, 'Lấy danh sách ảnh thành công.', images);
+  } catch (error) {
+    console.error('Get room images error:', error);
+    return errorResponse(res, 'Đã xảy ra lỗi', 'SERVER_ERROR', 500);
+  }
+};
+
+
+export const getRoomBookedDates = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const bookings = await Booking.findAll({
+      where: {
+        room_id: id,
+        status: { [Op.notIn]: ['cancelled', 'checked_out'] }
+      },
+      attributes: ['check_in_date', 'check_out_date']
+    });
+
+    return successResponse(res, 'Lấy danh sách ngày đã đặt thành công.', bookings);
+  } catch (error) {
+    console.error('Get room booked dates error:', error);
+    return errorResponse(res, 'Đã xảy ra lỗi', 'SERVER_ERROR', 500);
+  }
+};

@@ -6,7 +6,7 @@ import { successResponse, errorResponse } from '../../utils/response';
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findByPk(req.user?.userId, {
-      attributes: ['user_id', 'full_name', 'email', 'phone_number']
+      attributes: ['user_id', 'full_name', 'email', 'phone_number', 'address', 'id_card']
     });
 
     if (!user) {
@@ -17,7 +17,9 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
       userId: user.user_id,
       fullName: user.full_name,
       email: user.email,
-      phoneNumber: user.phone_number
+      phoneNumber: user.phone_number,
+      address: user.address,
+      idCard: user.id_card
     });
   } catch (error) {
     console.error('Get profile error:', error);
@@ -27,7 +29,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
-    const { fullName, phoneNumber } = req.body;
+    const { fullName, phoneNumber, address, idCard } = req.body;
     const user = await User.findByPk(req.user?.userId);
 
     if (!user) {
@@ -35,7 +37,9 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     }
 
     if (fullName) user.full_name = fullName;
-    if (phoneNumber) user.phone_number = phoneNumber;
+    if (phoneNumber !== undefined) user.phone_number = phoneNumber;
+    if (address !== undefined) user.address = address;
+    if (idCard !== undefined) user.id_card = idCard;
 
     await user.save();
 
@@ -43,7 +47,9 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       userId: user.user_id,
       fullName: user.full_name,
       email: user.email,
-      phoneNumber: user.phone_number
+      phoneNumber: user.phone_number,
+      address: user.address,
+      idCard: user.id_card
     });
   } catch (error) {
     console.error('Update profile error:', error);
@@ -56,10 +62,17 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const roleFilter = req.query.role ? parseInt(req.query.role as string) : undefined;
+    const currentUserRoleId = req.user?.roleId;
 
     const offset = (page - 1) * limit;
     const where: any = {};
-    if (roleFilter) where.role_id = roleFilter;
+    
+    // Lễ tân (role_id = 2) chỉ xem được khách hàng (role_id = 1)
+    if (currentUserRoleId === 2) {
+      where.role_id = 1;
+    } else if (roleFilter) {
+      where.role_id = roleFilter;
+    }
 
     const { count, rows } = await User.findAndCountAll({
       where,

@@ -170,12 +170,12 @@ INSERT INTO `amenities` (`amenity_name`) VALUES
 
 -- 5. Insert Rooms
 INSERT INTO `rooms` (`room_number`, `room_type_id`, `price_per_night`, `capacity`, `status`, `description`) VALUES
-('101', 1, 800000.00, 2, 'available', 'Phòng Standard tầng 1, view vườn.'),
-('102', 1, 850000.00, 2, 'cleaning', 'Phòng Standard tầng 1, gần sảnh.'),
-('201', 2, 1200000.00, 2, 'available', 'Phòng Deluxe tầng 2, có ban công.'),
-('202', 2, 1500000.00, 2, 'occupied', 'Phòng Deluxe tầng 2, view biển tuyệt đẹp.'),
-('301', 3, 2500000.00, 4, 'available', 'Phòng Suite tầng 3, có phòng khách và bếp nhỏ.'),
-('401', 4, 2000000.00, 5, 'maintenance', 'Phòng gia đình lớn, đang bảo trì hệ thống điều hòa.');
+('101', 1, 500000.00, 2, 'available', 'Phòng Standard tầng 1, view vườn.'),
+('102', 1, 550000.00, 2, 'cleaning', 'Phòng Standard tầng 1, gần sảnh.'),
+('201', 2, 900000.00, 2, 'available', 'Phòng Deluxe tầng 2, có ban công.'),
+('202', 2, 1200000.00, 2, 'occupied', 'Phòng Deluxe tầng 2, view biển tuyệt đẹp.'),
+('301', 3, 2000000.00, 4, 'available', 'Phòng Suite tầng 3, có phòng khách và bếp nhỏ.'),
+('401', 4, 1500000.00, 5, 'maintenance', 'Phòng gia đình lớn, đang bảo trì hệ thống điều hòa.');
 
 -- 6. Insert Room Images
 INSERT INTO `room_images` (`room_id`, `image_url`, `is_primary`) VALUES

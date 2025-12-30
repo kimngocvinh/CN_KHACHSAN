@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // Interceptor để tự động thêm token vào mỗi request
@@ -18,16 +22,38 @@ api.interceptors.request.use(
   }
 );
 
-// Interceptor để xử lý response errors
+// Interceptor để xử lý response errors với retry
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Nếu là lỗi network (backend đang restart), retry sau 2 giây
+    if (error.code === 'ERR_NETWORK' && !originalRequest._retry) {
+      originalRequest._retry = true;
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return api(originalRequest);
+    }
+
+    // Nếu là lỗi ECONNREFUSED (backend chưa sẵn sàng), retry
+    if (error.message?.includes('ECONNREFUSED') && !originalRequest._retry) {
+      originalRequest._retry = true;
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return api(originalRequest);
+    }
+
     if (error.response?.status === 401) {
       // Token hết hạn hoặc không hợp lệ
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // Chỉ redirect nếu không phải trang login/register
+      if (!window.location.pathname.includes('/login') && 
+          !window.location.pathname.includes('/register')) {
+        window.location.href = '/login';
+      }
     }
+    
     return Promise.reject(error);
   }
 );

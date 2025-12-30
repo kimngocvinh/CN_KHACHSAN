@@ -31,8 +31,15 @@ const LoginPage = () => {
       console.log('Login response:', response.data);
       
       if (response.data.success) {
-        setAuth(response.data.data.user, response.data.data.accessToken);
-        navigate('/');
+        const user = response.data.data.user;
+        setAuth(user, response.data.data.accessToken);
+        
+        // Redirect based on role
+        if (user.role === 'Quản trị viên' || user.role === 'Nhân viên lễ tân') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
         setError(response.data.message || 'Đăng nhập thất bại');
       }

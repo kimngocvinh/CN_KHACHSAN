@@ -3,24 +3,24 @@ import sequelize from '../config/db.config';
 
 interface ReviewAttributes {
   review_id: number;
-  booking_id: number;
+  booking_id?: number;
   user_id: number;
   room_id: number;
   rating: number;
   comment?: string;
-  review_date?: Date;
+  created_at?: Date;
 }
 
-interface ReviewCreationAttributes extends Optional<ReviewAttributes, 'review_id' | 'review_date'> {}
+interface ReviewCreationAttributes extends Optional<ReviewAttributes, 'review_id' | 'booking_id' | 'created_at'> {}
 
 class Review extends Model<ReviewAttributes, ReviewCreationAttributes> implements ReviewAttributes {
   public review_id!: number;
-  public booking_id!: number;
+  public booking_id?: number;
   public user_id!: number;
   public room_id!: number;
   public rating!: number;
   public comment?: string;
-  public readonly review_date!: Date;
+  public readonly created_at!: Date;
 }
 
 Review.init(
@@ -32,8 +32,7 @@ Review.init(
     },
     booking_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      unique: true
+      allowNull: true
     },
     user_id: {
       type: DataTypes.INTEGER,
@@ -55,9 +54,10 @@ Review.init(
       type: DataTypes.TEXT,
       allowNull: true
     },
-    review_date: {
+    created_at: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+      defaultValue: DataTypes.NOW,
+      field: 'review_date'
     }
   },
   {

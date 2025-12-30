@@ -28,6 +28,8 @@ export interface Booking {
   number_of_guests: number;
   total_price: number;
   status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
+  payment_method?: 'cash' | 'payos' | 'bank_transfer';
+  payment_status?: 'unpaid' | 'pending' | 'paid';
   booking_date: string;
   room?: {
     room_number: string;

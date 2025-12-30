@@ -5,12 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User } from 'lucide-react';
+import { Loader2, User, MapPin, CreditCard } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ProfileForm {
   fullName: string;
   phoneNumber: string;
+  address: string;
+  idCard: string;
 }
 
 const ProfilePage = () => {
@@ -31,6 +34,8 @@ const ProfilePage = () => {
         const profile = response.data.data;
         setValue('fullName', profile.fullName);
         setValue('phoneNumber', profile.phoneNumber || '');
+        setValue('address', profile.address || '');
+        setValue('idCard', profile.idCard || '');
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -54,6 +59,8 @@ const ProfilePage = () => {
             localStorage.getItem('accessToken') || ''
           );
         }
+        // Fetch lại profile để đảm bảo data được cập nhật
+        await fetchProfile();
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Cập nhật thất bại');
@@ -118,6 +125,31 @@ const ProfilePage = () => {
               <Input
                 id="phoneNumber"
                 {...register('phoneNumber')}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="idCard" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                Số CCCD/CMND
+              </Label>
+              <Input
+                id="idCard"
+                placeholder="Nhập số căn cước công dân"
+                {...register('idCard')}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Địa chỉ
+              </Label>
+              <Textarea
+                id="address"
+                placeholder="Nhập địa chỉ của bạn"
+                rows={3}
+                {...register('address')}
               />
             </div>
 

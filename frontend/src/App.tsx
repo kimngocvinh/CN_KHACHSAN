@@ -11,6 +11,9 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import RoomsPage from './pages/rooms/RoomsPage';
 import RoomDetailPage from './pages/rooms/RoomDetailPage';
+import ReviewsPage from './pages/ReviewsPage';
+import PaymentSecurityPage from './pages/PaymentSecurityPage';
+import SupportPage from './pages/SupportPage';
 
 // Customer Pages
 import MyBookingsPage from './pages/customer/MyBookingsPage';
@@ -21,6 +24,10 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminRooms from './pages/admin/RoomsManagement';
 import AdminBookings from './pages/admin/BookingsManagement';
 import AdminUsers from './pages/admin/UsersManagement';
+import SupportManagement from './pages/admin/SupportManagement';
+import PromotionsManagement from './pages/admin/PromotionsManagement';
+import PaymentSuccess from './pages/payment/PaymentSuccess';
+import PaymentCancel from './pages/payment/PaymentCancel';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode; requireAdmin?: boolean }) => {
@@ -43,9 +50,36 @@ function App() {
       <Routes>
         {/* Public Routes with Main Layout */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/rooms" element={<RoomsPage />} />
-          <Route path="/rooms/:id" element={<RoomDetailPage />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms" element={
+            <ProtectedRoute>
+              <RoomsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/rooms/:id" element={
+            <ProtectedRoute>
+              <RoomDetailPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/reviews" element={
+            <ProtectedRoute>
+              <ReviewsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/payment-security" element={
+            <ProtectedRoute>
+              <PaymentSecurityPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/support" element={
+            <ProtectedRoute>
+              <SupportPage />
+            </ProtectedRoute>
+          } />
           
           {/* Customer Protected Routes */}
           <Route path="/my-bookings" element={
@@ -63,6 +97,10 @@ function App() {
         {/* Auth Routes (No Layout) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Payment Routes */}
+        <Route path="/payment/success" element={<PaymentSuccess />} />
+        <Route path="/payment/cancel" element={<PaymentCancel />} />
 
         {/* Admin Routes with Admin Layout */}
         <Route path="/admin" element={
@@ -74,6 +112,9 @@ function App() {
           <Route path="rooms" element={<AdminRooms />} />
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="support" element={<SupportManagement />} />
+          <Route path="promotions" element={<PromotionsManagement />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
       </Routes>
     </BrowserRouter>

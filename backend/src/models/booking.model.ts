@@ -10,10 +10,12 @@ interface BookingAttributes {
   number_of_guests: number;
   total_price: number;
   status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
+  payment_method?: 'cash' | 'payos';
+  payment_status?: 'unpaid' | 'pending' | 'paid';
   booking_date?: Date;
 }
 
-interface BookingCreationAttributes extends Optional<BookingAttributes, 'booking_id' | 'status' | 'booking_date'> {}
+interface BookingCreationAttributes extends Optional<BookingAttributes, 'booking_id' | 'status' | 'payment_method' | 'payment_status' | 'booking_date'> {}
 
 class Booking extends Model<BookingAttributes, BookingCreationAttributes> implements BookingAttributes {
   public booking_id!: number;
@@ -24,6 +26,8 @@ class Booking extends Model<BookingAttributes, BookingCreationAttributes> implem
   public number_of_guests!: number;
   public total_price!: number;
   public status!: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
+  public payment_method!: 'cash' | 'payos';
+  public payment_status!: 'unpaid' | 'pending' | 'paid';
   public readonly booking_date!: Date;
 }
 
@@ -61,6 +65,14 @@ Booking.init(
     status: {
       type: DataTypes.ENUM('pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled'),
       defaultValue: 'pending'
+    },
+    payment_method: {
+      type: DataTypes.ENUM('cash', 'payos'),
+      defaultValue: 'cash'
+    },
+    payment_status: {
+      type: DataTypes.ENUM('unpaid', 'pending', 'paid'),
+      defaultValue: 'unpaid'
     },
     booking_date: {
       type: DataTypes.DATE,
